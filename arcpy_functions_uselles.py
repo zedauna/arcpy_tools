@@ -6,6 +6,7 @@
 # Author: VIGAN Jéros
 # Usage: 
 # Description: 
+#https://desktop.arcgis.com/fr/arcmap/10.3/tools/data-management-toolbox/an-overview-of-the-data-management-toolbox.htm
 # ---------------------------------------------------------------------------
 """
 #------------------------------
@@ -64,16 +65,22 @@ def verif_champ(entite_classe):
 #ajouter un champ à une couche choisie
 def ajout_champ(entite_classe,champ,typ):
     arcpy.AddField_management(entite_classe,champ,typ)
+    print(arcpy.GetMessages(0))
+    print('\n')
     print (' le champ '+champ + ' a été rajouté dans la classe ' +entite_classe+"\n")
 
 #supprimer un champ d'une couche choisie
 def supprime_champ(entite_classe,champ):
     arcpy.DeleteField_management(entite_classe,champ)
+    print(arcpy.GetMessages(0))
+    print('\n')
     print (' le champ '+champ + ' a été supprimé de la classe ' +entite_classe+"\n")
 
 #calcul des valeurs d'un champ d'une couche choisie
 def calcul_champ(entite_classe,champ,formule):
     arcpy.CalculateField_management(entite_classe,champ,formule,"PYTHON")
+    print(arcpy.GetMessages(0))
+    print('\n')
     print (' le champ '+champ + ' a été modifié avec la formule' + formule+"\n")
 
 #Fonction d'affichage d'une liste
@@ -216,6 +223,8 @@ def reorder_fields(table, out_table, field_order, add_missing=True):
             
     # use merge with single input just to use new field_mappings
     arcpy.Merge_management(table, out_table, new_mapping)
+    print(arcpy.GetMessages(0))
+    print('\n')
     return out_table
 
 #Fonction de travail
@@ -224,10 +233,14 @@ def selectByAttribute1(source,intermediaire,critere,destination):
     arcpy.SelectLayerByAttribute_management(intermediaire,"NEW_SELECTION",critere)
     arcpy.CopyFeatures_management(intermediaire,destination)
     arcpy.SelectLayerByAttribute_management(intermediaire,"CLEAR_SELECTION")
+    print(arcpy.GetMessages(0))
+    print('\n')
     print("la couche : "+destination+ " selon votre critere de selection est bien effectuée\n")
 
 def selectByAttribute2(source,critere,destination='ville41_bis'):
     arcpy.Select_analysis(source,destination,critere)
+    print(arcpy.GetMessages(0))
+    print('\n')
     print("la couche : "+destination+ " selon votre critere de selection est bien effectuée\n")
 
 
@@ -236,6 +249,8 @@ def selectByLocation(couche1,couche2,intermediaire,destination,condition="WITHIN
     arcpy.SelectLayerByLocation_management(intermediaire,condition,couche2)
     arcpy.CopyFeatures_management(intermediaire,destination)
     arcpy.SelectLayerByAttribute_management(intermediaire,"CLEAR_SELECTION")
+    print(arcpy.GetMessages(0))
+    print('\n')
     print("la couche : "+destination+ " selon votre critere de selection est bien effectuée \n")
 
 def selectByAttribute3(couche,intermediaire,destination,critere1,critere2):
@@ -244,8 +259,11 @@ def selectByAttribute3(couche,intermediaire,destination,critere1,critere2):
     arcpy.SelectLayerByAttribute_management(intermediaire,"SUBSET_SELECTION",critere2)
     arcpy.CopyFeatures_management(intermediaire,destination)
     arcpy.SelectLayerByAttribute_management(intermediaire,"CLEAR_SELECTION")
+    print(arcpy.GetMessages(0))
+    print('\n')
     print("la couche : "+destination+ " selon votre critere de selection est bien effectuée \n")
 
+#liste des selections existantes 
 list_sellection=["WITHIN","INTERSECT","WITHIN_A_DISTANCE","CONTAINS","SHARE_A_LINE_SEGMENT_WITH","HAVE_THEIR_CENTER_IN"]
 
 def verif_selection(list_sellection):
@@ -255,7 +273,22 @@ def verif_selection(list_sellection):
     else:
         return choix_selection
 
-#fonction  modification
+def jointurePermanente(source,joint_field_1,joint_field_2,table_joint):
+    arcpy.MakeFeatureLayer_management(source,source+"_joint")
+    arcpy.AddJoin_management(source+"_joint",joint_field_1,table_joint,joint_field_2)
+    #arcpy.AddJoin_management(base1, champ 1, base2, champ 2, "KEEP_ALL")
+    print(arcpy.GetMessages(0))
+    print('\n')
+    print("la couche : "+source+"_joint est prête\n")
+
+#https://pro.arcgis.com/fr/pro-app/latest/tool-reference/analysis/spatial-join.htm
+def jointureSpatial(target_features, join_features, out_feature_class):
+    arcpy.SpatialJoin_analysis(target_features, join_features, out_feature_class)
+    print(arcpy.GetMessages(0))
+    print('\n')
+    print("la couche : "+source+"_joint est prête\n")
+    
+#fonction modification
 def modif(classe_entite,cible,champ,valeur):
     c1=arcpy.UpdateCursor(classe_entite,cible,None,champ)
     ligne=c1.next()
@@ -291,5 +324,3 @@ def rech(classe_entite,champ):
 #----------------------------------------------
 repertoire
 arcpy.env.workspace=repertoire
-
-
